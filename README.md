@@ -2,4 +2,4 @@
 
 cs50w-project2-commerce
 
-Video Demonstration: https://youtu.be/tlNqfuiR7kQ
+Video Demonstration: https://youtu.be/7twKGe0FGqU
