@@ -1,0 +1,79 @@
+{% extends "auctions/layout.html" %}
+{% load humanize %}
+
+<!-- Title for the browser tab/window-->
+{% block title %}
+    {{ page_header }}
+{% endblock %}
+
+{% block body %}
+    <!-- Title for the page -->
+    <center>
+        <h2> {{ page_header }} </h2>
+    </center>
+    <br>
+    <div class="container">
+        <div class="row">
+            <!-- Loop that generates listings that are open -->
+            {% for listing in listings %}
+                <!-- Bootstrap card that "holds" the listing details -->
+                <div class="card col col-lg-4 col-md-3 col-sm-6 col-12 pb-3 pt-3 px-3 rounded-0">
+                    <!-- Path to the listing that takes in the listing.id as a value to pass to the path -->
+                    <a href="{% url 'listing' listing.id %}" class="card-link">
+                        <!-- Image for the listing. If no image URL exists for the listing in the db, then by default a "no image" sign will appear -->
+                        <img src="{{ listing.image.image|default:"https://i.ibb.co/WkqVJGP/nounproj-noimg.jpg" }}" class="card-img-top shadow-sm" alt="{{ listing.image.alt_name|default:"No image found." }}" height="250">
+                    </a>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item card-title">
+                                <!-- If the listing was added to the user's watchlist, a green eye icon will appear under the title of the listing -->
+                                {% if listing.is_watched %}
+                                    <center>
+                                        <h5>{{ listing.title }}</h5>
+                                        <h5><i class="fa fa-eye" style="color:#00A36C;" aria-hidden="true"></i></h5>
+                                    </center>
+                                <!-- If the listing is not on the user's watchlist, then the mere title will appear for the listing -->
+                                {% else %}
+                                    <center>
+                                        <h5>{{ listing.title }}</h5>
+                                    </center>
+                                {% endif %}
+                            </li>
+                            <li class="list-group-item card-text">
+                                <!-- The listing's description -->
+                                <p>{{ listing.description }}</p>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="card-footer bg-white">
+                        <center>
+                            <!-- If the listing has a bid on it, then show how many bids are on the item and the most recent bid price -->
+                            {% if listing.current_price %}
+                                <!-- If the listing only has a single bid on it in total, then do not pluralize the word "Bid" -->
+                                {% if listing.bid_sum == 1 %}
+                                    <span class="text-danger"><strong>{{ listing.bid_sum }} Bid</strong></span>
+                                <!-- Otherwise, pluralize the word "Bids" -->
+                                {% else %}
+                                    <span class="text-danger"><strong>{{ listing.bid_sum }} Bids</strong></span>
+                                {% endif %}
+                                <br>
+                                <!-- The most recent bid price, with the float value set to only show two decimal places and to hyperlink to the listing page -->
+                                <a href="{% url 'listing' listing.id %}" class="card-link">
+                                    ${{ listing.current_price|floatformat:2|intcomma }}
+                                </a>
+                            <!-- If the listing doesn't have any bids on it, then show this status message -->
+                            {% else %}
+                                <span style="color:grey">No bids!</span>
+                                <br>
+                                <!-- Display the starting, floor price of the listing and a hyperlink the user to the listing page -->
+                                <a href="{% url 'listing' listing.id %}" class="card-link">
+                                    Starting at ${{ listing.starting_price|floatformat:2|intcomma }}
+                                </a>
+                            {% endif %}
+                        </center>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

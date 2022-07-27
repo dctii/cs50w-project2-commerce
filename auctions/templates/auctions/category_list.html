@@ -1,0 +1,76 @@
+{% extends "auctions/layout.html" %}
+{% load humanize %}
+
+<!-- Title for the browser/tab -->
+{% block title %}
+    {# https://bit.ly/3asrjkL 'How to break "for loop" in Django template' #}
+    {# |slice:"1" only keeps one from the set, -- without this, the title would be generated as many times as there are listings that are part of the category #}
+    {% for listing in listings|slice:"1" %}
+        Active Listings for {{ listing.category|title }}
+    {% endfor %}
+{% endblock %}
+
+{% block body %}
+    {# Title for the content of the page #}
+    {% for listing in listings|slice:"1" %}
+        <center>
+            <h2> {{ listing.category|title }} </h2>
+        </center>
+    {% endfor %}
+
+    <br>
+    <!-- Display gallery of all listings falling under the category, the Django HTML here mirrors the listing representation on index.html for all active listings -->
+    <div class="container">
+        <div class="row">
+            {% for listing in listings %}
+                <div class="card col col-lg-4 col-md-3 col-sm-6 col-12 pb-3 pt-3 px-3 rounded-0">
+                    <a href="{% url 'listing' listing.id %}" class="card-link">
+                        <img src="{{ listing.image.image|default:"https://i.ibb.co/WkqVJGP/nounproj-noimg.jpg" }}" class="card-img-top shadow-sm" alt="{{ listing.image.alt_name|default:"No image found." }}">
+                    </a>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item card-title">
+                                <!-- If the listing was added to the user's watchlist, a green eye icon will appear under the title of the listing -->
+                                {% if listing.is_watched %}
+                                    <center>
+                                        <h5>{{ listing.title }}</h5>
+                                        <h5><i class="fa fa-eye" style="color:#00A36C;" aria-hidden="true"></i></h5>
+                                    </center>
+                                <!-- If the listing is not on the user's watchlist, then the mere title will appear for the listing -->
+                                {% else %}
+                                    <center>
+                                        <h5>{{ listing.title }}</h5>
+                                    </center>
+                                {% endif %}
+                            </li>
+                            <li class="list-group-item card-text">
+                                <p>{{ listing.description }}</p>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="card-footer bg-white">
+                        <center>
+                            {% if listing.current_price %}
+                                {% if listing.bid_sum == 1 %}
+                                    <span class="text-danger"><strong>{{ listing.bid_sum }} Bid</strong></span>
+                                {% else %}
+                                    <span class="text-danger"><strong>{{ listing.bid_sum }} Bids</strong></span>
+                                {% endif %}
+                            <br>
+                            <a href="{% url 'listing' listing.id %}" class="card-link">
+                                ${{ listing.current_price|floatformat:2|intcomma }}
+                            </a>
+                            {% else %}
+                            <span style="color:grey">No bids!</span>
+                            <br>
+                            <a href="{% url 'listing' listing.id %}" class="card-link">
+                                Starting at ${{ listing.starting_price|floatformat:2|intcomma }}
+                            </a>
+                            {% endif %}
+                        </center>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

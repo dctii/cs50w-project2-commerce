@@ -1,0 +1,42 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+
+    <!-- Added Bootstrapping of the Login page for aesthetic purposes -->
+    <div class="col-md-10 mx-auto col-lg-5">
+
+        <form action="{% url 'register' %}" class="p-4 p-md-5 border rounded-3 bg-light" method="POST">
+
+            {% csrf_token %}
+
+            <div class="form-group form-floating mb-3">
+                <input type="text" name="username" placeholder="Username" autofocus autocomplete="off" class="form-control w-100">
+                <label for="floatingInput">Username</label>
+            </div>
+            <div class="form-group form-floating mb-3">
+                <input type="email" name="email" placeholder="name@domain.com" autocomplete="off" class="form-control w-100">
+                <label for="floatingInput">E-mail Address</label>
+            </div>
+            <div class="form-group form-floating mb-3">
+                <input type="password" name="password" placeholder="Password" autocomplete="off" class="form-control w-100">
+                <label for="floatingPassword">Password</label>
+            </div>
+            <div class="form-group form-floating mb-3">
+                <input type="password"  name="confirmation" placeholder="Confirm Password" autocomplete="off" class="form-control w-100">
+                <label for="floatingPassword2">Confirm Password</label>
+            </div>
+            <input type="submit" role="button" value="Register" class="btn btn-lg btn-primary w-100"/>
+            {% if message %}
+                <br>
+                <br>
+                <div>
+                    <center><span class="alert alert-danger">{{ message }}</span>
+                </div>
+                <br>
+            {% endif %}
+            <hr class="my-4">
+            <small class="text-muted">Already have an account? <a href="{% url 'login' %}">Log In here.</a></small>
+        </form>
+    </div>
+
+{% endblock %}

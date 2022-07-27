@@ -1,0 +1,35 @@
+{% extends "auctions/layout.html" %}
+
+<!-- Title for the browser/tab -->
+{% block title %}
+    🗂️ Categories
+{% endblock %}
+
+{% block body %}
+    <!-- Title for the content of the page -->
+    <center>
+        <h2 class="pb-1">{{ page_header }}</h2>
+    </center>
+
+    <!-- List of different categories on the site -->
+    <div class="row mx-auto">
+        <!-- Loop to dynamically generate different categories in the Category model-->
+        {% for category in categories %}
+            <div class="col col-lg-4 col-md-3 col-sm-6 col-12 mx-0">
+                <!-- Path that takes in the category ID to hyperlink the user to a listing page that is filtered by category -->
+                <a class="nav-link" href="{% url 'category_list' cat_id=category.id %}">
+                    <div class="card bg-light shadow-sm" style="width: 18rem;">
+                        <!-- Representative image for the category -->
+                        <img class="card-img-top" src="{{ category.image.url }}" alt="Category {{ category.id }} image">
+                        <div class="card-body">
+                            <!-- Name of the Category -->
+                            <center>
+                                <h5 class="card-title">{{ category.category|title }}</h5>
+                            </center>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

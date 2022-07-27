@@ -1,0 +1,18 @@
+Admin:
+----------------
+username: admin
+password: 123
+
+Normal Users:
+----------------
+username: dana
+password: dana123456!
+
+username: sally
+password: sally123456!
+
+username: lucy
+password: lucy123456!
+
+username: idris
+password: idris123456!

@@ -1,0 +1,191 @@
+{% extends "auctions/layout.html" %}
+{% load humanize %}
+
+<!-- Title for the browser tab/window-->
+{% block title %}
+    Auction: {{ listing.title }}
+{% endblock %}
+
+
+{% block body %}
+    <div class="container">
+        <div class="row">
+            <div class="card border-light col col-lg-8 col-md-8 col-sm-12">
+                <!-- Image for the listing -->
+                {% for listing_image in listing_images %}
+                    <img class="card-img-top" src="{{ listing_image.image }}" alt="{{ listing_image.alt_name }}">
+                    <!-- If no image URL exists for the listing in the db, then by default a "no image" sign will appear -->
+                    {% empty %}
+                        <img class="card-img-top" src="https://i.ibb.co/WkqVJGP/nounproj-noimg.jpg" alt="No image found.">
+                {% endfor %}
+            </div>
+
+            <div class="card border-primary col col-12 col-lg-4 col-md-4 col-sm-12">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <!-- If the listing is open, then show the mere title -->
+                        {% if listing.open_listing %}
+                            {{ listing.title }}
+                        {% endif %}
+                        <!-- If the listing is closed, then show this status prompt and the title below it -->
+                        {% if not listing.open_listing %}
+                            <span class="text-danger"><i>This listing has closed.</i></span>
+                            <br>
+                            <br>
+                            {{ listing.title }}
+                        {% endif %}
+                        <!-- If the user is the one who listed the item and the item is listed, then show a button that allows them to close the listing if they click it -->
+                        {% if listing.lister == user and listing.open_listing %}
+                            <a role="button" href="{% url 'close_listing' listing.id %}" class="btn btn-outline-info btn-sm">
+                                Close
+                            </a>
+                        {% endif %}
+                    </h5>
+                    <!-- Watchlist button that holds a path to activating and deactivating the watchlist status of the item-->
+                    <a href="{% url 'watchlist_switch' listing.id 'listing' %}" class="card-link">
+                        <!-- Red button to remove it from the watch list if the item is being watched -->
+                        {% if listing.is_watched %}
+                            <button class="btn btn-danger btn-sm"><strong>- Watchlist</strong></button>
+                        <!-- and a blue one if it is not and they can add it to their watchlist -->
+                        {% else %}
+                            <button class="btn btn-primary btn-sm"><strong>+ Watchlist</strong></button>
+                        {% endif %}
+                    </a>
+                    <p class="card-text">
+                        <h6> <i>Description </i></h6>
+                    </p>
+                    <!-- The listing's description -->
+                    <p class="card-text">
+                        {{ listing.description }}
+                    </p>
+                    <hr class="solid">
+                    <!-- If there is no recent bid, then show the starting, floor price with a float value that contains only two decimal places-->
+                    {% if listing.current_price is None %}
+                        <p class="card-text text-primary">
+                            Starting price: ${{ listing.starting_price|floatformat:2|intcomma }}
+                        </p>
+                        <!-- If the user is not hte one who listed the listing, then show this prompt -->
+                        {% if listing.lister != user %}
+                            Make the first bid of this listing!
+                        <!-- If the user is the lister, then do not show a prompt -->
+                        {% else %}
+                            {# empty #}
+                        {% endif %}
+                    <!-- If there is a winner for the auction (when there is at least one bid and the listing is closed), then do this-->
+                    {% elif listing.buyer is not None %}
+                        <!-- If the user is the one who listed the listing, then show this when the listing is closed and there is a winner -->
+                        {% if listing.lister == user %}
+                            You've sold this item to <b class="text-primary">{{ listing.buyer }}</strong> for ${{ listing.current_price|floatformat:2 }}.
+                        <!-- If the user is the winner of the auction for the listing, then show this -->
+                        {% elif listing.buyer == user %}
+                            You've won this auction for ${{ listing.current_price|floatformat:2|intcomma }}, <b class="text-primary">{{ listing.buyer }}</strong>!
+                        <!-- If none of the above conditions, then do this (for those who are both non-winners and non-listers)-->
+                        {% else %}
+                            This item has already sold for the price of ${{ listing.current_price|floatformat:2|intcomma }}.
+                        {% endif %}
+                    <!-- If the listing has bids on it, then do this -->
+                    {% else %}
+                        <!-- For if there is only one bid -->
+                        {% if bid_sum == 1 %}
+                            <span class="text-danger"><strong>{{ bid_sum }} Bid</strong></span><br>
+                        <!-- For when there is more than one bid and not 0 bids -->
+                        {% else %}
+                            <span class="text-danger"><strong>{{ bid_sum }} Bids</strong></span><br>
+                        {% endif %}
+                            <!-- The amount of the most recent bid -->
+                            Current price: ${{ listing.current_price|floatformat:2|intcomma }}
+                        {% endif %}
+
+                        <hr class="solid">
+                        <!-- Do this if the user is the one who listed the item -->
+                        {% if listing.lister == user %}
+                            You, <span style="color:#5D3FD3;"><strong>{{ listing.lister }}</strong></span>, listed this item.
+                        <!-- Otherwise, do this -->
+                        {% else %}
+                            Listed by <span style="color:#5D3FD3;"><strong>{{ listing.lister }}</strong>.</span>
+                        {% endif %}
+
+                        <!-- If the user has not made a valid bid, one that is less than or equal to the most recent bid or is less than the floor price, then do this -->
+                        {% if error_min_value %}
+                            <p class="card-text">
+                                <!-- If there is at least one bid on the item, then do this -->
+                                {% if listing.current_price %}
+                                    <div class="alert alert-warning" role="alert">
+                                        Your bid must be greater than ${{ listing.current_price|floatformat:2|intcomma }}
+                                    </div>
+                                <!-- Otherwise, do this when there are no bids on the item; bid >= starting.price -->
+                                {% else %}
+                                    <div class="alert alert-warning" role="alert">
+                                        Your bid must be equal to or greater than ${{ listing.starting_price|floatformat:2|intcomma }}
+                                    </div>
+                                {% endif %}
+                            </p>
+                        {% endif %}
+                        <hr class="solid">
+                        <!-- Do this if the listing is unclosed -->
+                        {% if listing.open_listing %}
+                            <!-- Don't show anything here if the user is the one who listed the item -->
+                            {% if listing.lister == user %}
+                                {# empty #}
+                            {% endif %}
+                            <!-- If the user is not the one who listed the item, then do this and show them an input box and bid submission button they can use to place their bid -->
+                            {% if listing.lister != user %}
+                                <div class="form-group">
+                                    <form action="{% url 'take_bid' listing.id %}" method="POST">
+                                        <div class="input-group">
+                                            {% csrf_token %}
+                                            {{ form }}
+                                            <div class="input-group-append">
+                                                <input type="submit" role="button" value="Bid" class="btn btn-sm btn-outline-success">
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            {% endif %}
+                        {% endif %}
+                        <!-- Display the date the listing was made -->
+                        <p class="card-text">
+                            <small class="text-muted">
+                                Created on {{ listing.created_date|date:"M, d" }}
+                            </small>
+                        </p>
+                </div>
+            </div>
+
+            <!-- The comments section -->
+            <div class="card border-light col col-12 col-lg-12 col-md-12 col-sm-12">
+                <h4 class="text-dark pt-4">Join the conversation below!</h4>
+                <hr class="solid">
+                <!-- If the listing is open, show a place where a comment can be submitted for the listing -->
+                {% if listing.open_listing %}
+                    <div class="form-group">
+                        <form action="{% url 'comment' listing.id %}" method="POST">
+                            <div class="input-group">
+                                {% csrf_token %}
+                                {{ comments_form }}
+                                <div class="input-group-append">
+                                    <input type="submit" role="button" value="Submit" class="btn btn-sm btn-success" style="margin-top: -1px;">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                {% endif %}
+                <!-- The comments that have already been submitted are here -->
+                {% for comment in comments %}
+                    <div class="card border-secondary">
+                        <div class="card-header">
+                            <!-- Displays the user and the date they had commented -->
+                            <span class="text-primary"><strong>{{ comment.user }}</strong></span> commented on <i>{{ comment.date_created|date:"M, d" }}</i>
+                        </div>
+                        <!-- Displays the comment that the user had made -->
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                {{ comment.comment }}
+                            </h5>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

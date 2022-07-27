@@ -1,0 +1,15 @@
+body {
+    padding: 10px;
+}
+
+input[type = text], input[type = number], input[type = password], input[type = email], select[name = category]{
+    border: none;
+    border-bottom: 3px solid lightgray;
+    border-right: 3px solid lightgray;
+    
+}
+
+a:hover {
+    background-color: none;
+
+}

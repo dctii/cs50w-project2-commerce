@@ -1,0 +1,32 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <!-- Added Bootstrapping of the Login page for aesthetic purposes -->
+    <div class="col-md-10 mx-auto col-lg-5">
+        <form action="{% url 'login' %}" class="p-4 p-md-5 border rounded-3 bg-light" method="POST">
+            {% csrf_token %}
+            
+            <div class="form-floating mb-3">
+                <input autofocus type="text" name="username" placeholder="Username" class="form-control w-100">
+                <label for="floatingInput">Username</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input type="password" name="password" placeholder="Password" class="form-control w-100">
+                <label for="floatingPassword">Password</label>
+            </div>
+            <input role="button" type="submit" value="Login" class="btn btn-lg btn-primary w-100" />
+            {% if message %}
+                <br>
+                <br>
+                <div>
+                    <center>
+                        <span class="alert alert-danger">{{ message }}</span>
+                    </center>
+                </div>
+                <br>
+            {% endif %}
+            <hr class="my-4">
+            <small class="text-muted">Don't have an account? <a href="{% url 'register' %}">Register here.</a></small>
+        </form>
+    </div>
+{% endblock %}

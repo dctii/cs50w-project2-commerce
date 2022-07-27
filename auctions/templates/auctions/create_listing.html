@@ -1,0 +1,36 @@
+{% extends "auctions/layout.html" %}
+
+<!-- Title for the browser/tab -->
+{% block title %}
+    Create New Listing
+{% endblock %}
+
+{% block body %}
+    <!-- Title for the content of the page -->
+    <h3> Create a New Listing </h3>
+    <br>
+
+    <!-- Show this message if and after the user has successfully created the listing -->
+    {% if success %}
+        <h4 class="alert alert-success">Your new listing has been successfully created!</h4>
+    {% endif %}
+
+    <!-- Create Listing Form -->
+    <div class="col-md-10 col-lg-5">
+        <div class="form-group form-floating mb-3">
+            <form action="{% url 'create_listing' %}" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <!-- Listing information -->
+                {{ form.as_p }}
+                <!-- Image and alt information for the listing -->
+                {{ image_form.management_form }}
+                {% for form in image_form %}
+                    {{ form.as_p }}
+                {% endfor %}
+                <!-- Submit button to POST the listing information -->
+                <input type="submit" role="button" value="Create New Listing" class="btn btn-success shadow-sm">
+            </form>
+        </div>
+    </div>
+
+{% endblock %}

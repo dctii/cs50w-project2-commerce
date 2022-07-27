@@ -1,0 +1,97 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <!-- Blockspace for the title -->
+        <title>
+            {% block title %}
+            {% endblock %}
+        </title>
+
+        <!-- Meta Tags -->
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <!-- Favicon -->
+        <link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Font_Awesome_5_solid_gavel.svg/1024px-Font_Awesome_5_solid_gavel.svg.png?20180810211343">
+
+        <!-- Font Awesome 4.7.0 -->
+        <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+        
+        <!-- Bootstrap 4.6.1 CSS -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css" integrity="sha384-zCbKRCUGaJDkqS1kPbPd7TveP5iyJE0EjAuZQTgFLD2ylzuqKfdKlfG/eSrtxUkn" crossorigin="anonymous">
+
+        <!-- Bootstrap 4.6.1 JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.min.js" integrity="sha384-VHvPCCyXqtD5DqJeNxl2dtTyhF78xXNXdkwX1CZeRusQfRKp+tA7hAShOK/B/fQ2" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-fQybjgWLrvvRgtW6bFlB7jaZrFsaBXjsOMm/tB9LTS58ONXgqbR9W8oWht/amnpF" crossorigin="anonymous"></script>
+
+        <!-- Custom CSS -->
+        <link href="{% static 'auctions/styles.css' %}" rel="stylesheet">
+    </head>
+    <body>
+        <!-- Top Navigation Bar-->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark p-0">
+            <!-- Website Title -->
+            <a href="{% url 'index' %}" class="navbar-brand px-5"><strong>Auction</strong></a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <!-- Navbar Items -->
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link lead text-white " href="{% url 'index' %}">Active Listings</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link lead text-white" href="{% url 'categories' %}">Categories</a>
+                    </li>
+                    <!-- Appear if the user is logged in -->
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link lead text-white" href="{% url 'watchlist' %}">Watchlist</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link lead text-white" href="{% url 'create_listing' %}">
+                                Create Listing
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link btn-danger lead text-white rounded-0 lead" role="button" href="{% url 'logout' %}">
+                                Log Out
+                            </a>
+                        </li>
+                    <!-- If the user is not logged in, then show these -->
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link btn-success lead text-white rounded-0" role="button" href="{% url 'login' %}">
+                                Log In
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link lead text-white btn-primary rounded-0" role="button" href="{% url 'register' %}">
+                                Register
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </nav>
+        <div style="text-align:right">
+            <!-- If the user is signed in, then show this status on the top right under the navbar -->
+            {% if user.is_authenticated %}
+                <p class="lead pr-3 pt-3">
+                    Signed in as <strong style="color:#5D3FD3;">{{ user.username }}</strong>.
+                </p>
+            <!-- If the user is not signed in, then show this status on the top right, just under the navbar -->
+            {% else %}
+                <p class="lead pr-3 pt-3 text-danger">
+                    <strong>You are not signed in.</strong>
+                </p>
+            {% endif %}
+        </div>
+        <hr>
+        <!-- Blockspace for body content under the navbar -->
+        {% block body %}
+        {% endblock %}
+    </body>
+</html>
